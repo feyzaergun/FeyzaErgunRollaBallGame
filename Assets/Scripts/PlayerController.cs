@@ -1,41 +1,43 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem; // Yeni kontrol sistemi için bu şart!
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 10f; // Topun hızı (Inspector'dan değiştirebilirsin)
+    public float speed = 10f;
     private Rigidbody rb;
-
-    // X ve Y eksenindeki hareket değerlerini tutacak değişkenler
     private float movementX;
     private float movementY;
 
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody>(); // Rigidbody bileşenini rb değişkenine atıyoruz
+        rb = GetComponent<Rigidbody>();
     }
 
-    // Klavyeden (WASD veya Ok tuşları) gelen girdiyi okuyan fonksiyon
     void OnMove(InputValue movementValue)
     {
-        // Gelen girdiyi 2 boyutlu bir vektör olarak al
         Vector2 movementVector = movementValue.Get<Vector2>();
-
-        // X ve Y değerlerini değişkenlerimize kaydet
         movementX = movementVector.x;
         movementY = movementVector.y;
     }
 
-    // Fizik hesaplamaları için Update yerine FixedUpdate kullanıyoruz
     void FixedUpdate()
     {
-        // Y eksenini (yukarı/aşağı) 0 tutarak X ve Z ekseninde hareket vektörü oluşturuyoruz
         Vector3 movement = new Vector3(movementX, 0.0f, movementY);
-
-        // Topa gücü (hızı) uyguluyoruz
         rb.AddForce(movement * speed);
+    }
+
+    // --- YENİ EKLENEN KISIM BURASI ---
+    // Top başka bir nesneyle temas ettiğinde çalışır
+    private void OnTriggerEnter(Collider other)
+    {
+        // Eğer çarptığımız nesnenin etiketi (Tag) "PickUp" ise
+        if (other.gameObject.CompareTag("PickUp"))
+        {
+            // O nesneyi pasif yap (ekrandan sil, toplanmış gibi göster)
+            other.gameObject.SetActive(false);
+        }
     }
 }
